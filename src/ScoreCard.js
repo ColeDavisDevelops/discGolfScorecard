@@ -16,30 +16,6 @@ const useStyles = makeStyles(theme => ({
 
 }))
 
-const initHoleData = {
-  ['hole 1']: 3,
-  ['hole 2']: 3,
-  ['hole 3']: 3,
-  ['hole 4']: 3,
-  ['hole 5']: 3,
-  ['hole 6']: 3,
-  ['hole 7']: 3,
-  ['hole 8']: 3,
-  ['hole 9']: 3,
-  ['hole 10']: 3,
-  ['hole 11']: 3,
-  ['hole 12']: 3,
-  ['hole 13']: 3,
-  ['hole 14']: 3,
-  ['hole 15']: 3,
-  ['hole 16']: 3,
-  ['hole 17']: 3,
-  ['hole 18']: 3,
-  ['hole 19']: 3,
-  ['hole 20']: 3,
-  ['hole 21']: 3,
-  ['hole 22']: 3,  
-}
 
 const ScoreCard = () => {
   const [state, setState] = useState({
@@ -60,12 +36,13 @@ const ScoreCard = () => {
     const getData = async() => {
       firebase.firestore().collection('scoreCard').doc('state')
         .onSnapshot((doc) => {
-          let data = doc.data()         
+          let data = doc.data()  
           setState(state => ({
             ...state,
             players: data.players,
             holes: data.holes,
-          }))                                
+          }))   
+                                 
         })
       firebase.firestore().collection('scoreCard').doc('par')
         .onSnapshot((doc) => {
@@ -111,12 +88,25 @@ const ScoreCard = () => {
         [name]: event.target.value
       })
       .then(() => {
-        clearRowValues();
+        console.log('changed')
       })
       .catch((err) => {
         console.log(err)
       })
-    console.log(state)
+    if (name === 'holes') {
+      firebase.firestore().collection('scoreCard').doc('par')
+        .set(initRows(event.target.value, 3))
+        .then(() => {
+          let rows = initRows(event.target.value, 3)
+          setState(state => ({
+            ...state,
+            ['par']: rows      
+          }))
+        })
+        .catch((err) => {
+          console.log(err)
+        }) 
+    } 
   }
 
   const handleChangeValue = (name, counter) => (event) => {
@@ -152,12 +142,8 @@ const ScoreCard = () => {
       total = colValues.reduce((tot, num) => {
         return (tot + num)
       })
-      console.log(total)
     } else {
       total = state.holes
-    }
-    if (obj === 'par') {
-      total = total - ((22 - state.holes) * 3)
     }
     return total
   }
@@ -271,60 +257,22 @@ const ScoreCard = () => {
     return holes
   }
 
+  const initRows = (numOfRows, rowValue) => {
+    let rows = {};
+    for (let i=1; i<=numOfRows; i++) {
+      rows[`hole ${i}`] = rowValue;
+    }
+    return rows;
+  }
+
   const clearRowValues = () => {
     firebase.firestore().collection('scoreCard').doc('par')
-      .set({
-        ['hole 1']: 3,
-        ['hole 2']: 3,
-        ['hole 3']: 3,
-        ['hole 4']: 3,
-        ['hole 5']: 3,
-        ['hole 6']: 3,
-        ['hole 7']: 3,
-        ['hole 8']: 3,
-        ['hole 9']: 3,
-        ['hole 10']: 3,
-        ['hole 11']: 3,
-        ['hole 12']: 3,
-        ['hole 13']: 3,
-        ['hole 14']: 3,
-        ['hole 15']: 3,
-        ['hole 16']: 3,
-        ['hole 17']: 3,
-        ['hole 18']: 3,
-        ['hole 19']: 3,
-        ['hole 20']: 3,
-        ['hole 21']: 3,
-        ['hole 22']: 3,
-      })
+      .set(initRows(state.holes, 3))
       .then(() => {
-        console.log('reset!')
+        let rows = initRows(state.holes, 3)
         setState(state => ({
           ...state,
-          ['par']: {
-            ['hole 1']: 3,
-            ['hole 2']: 3,
-            ['hole 3']: 3,
-            ['hole 4']: 3,
-            ['hole 5']: 3,
-            ['hole 6']: 3,
-            ['hole 7']: 3,
-            ['hole 8']: 3,
-            ['hole 9']: 3,
-            ['hole 10']: 3,
-            ['hole 11']: 3,
-            ['hole 12']: 3,
-            ['hole 13']: 3,
-            ['hole 14']: 3,
-            ['hole 15']: 3,
-            ['hole 16']: 3,
-            ['hole 17']: 3,
-            ['hole 18']: 3,
-            ['hole 19']: 3,
-            ['hole 20']: 3,
-            ['hole 21']: 3,
-            ['hole 22']: 3,  
-          }      
+          ['par']: rows      
         }))
       })
       .catch((err) => {
@@ -334,58 +282,12 @@ const ScoreCard = () => {
     
     for (let i=0; i<state.players; i++) {
       firebase.firestore().collection('scoreCard').doc(`player ${i+1}`)
-        .set({
-          ['hole 1']: 0,
-          ['hole 2']: 0,
-          ['hole 3']: 0,
-          ['hole 4']: 0,
-          ['hole 5']: 0,
-          ['hole 6']: 0,
-          ['hole 7']: 0,
-          ['hole 8']: 0,
-          ['hole 9']: 0,
-          ['hole 10']: 0,
-          ['hole 11']: 0,
-          ['hole 12']: 0,
-          ['hole 13']: 0,
-          ['hole 14']: 0,
-          ['hole 15']: 0,
-          ['hole 16']: 0,
-          ['hole 17']: 0,
-          ['hole 18']: 0,
-          ['hole 19']: 0,
-          ['hole 20']: 0,
-          ['hole 21']: 0,
-          ['hole 22']: 0,
-        })
+        .set(initRows(state.holes, 0))
         .then(() => {
-          console.log('reset!')
+          let rows = initRows(state.holes, 0)
           setState(state => ({
             ...state,
-            [`player ${i+1}`]: {
-              ['hole 1']: 0,
-              ['hole 2']: 0,
-              ['hole 3']: 0,
-              ['hole 4']: 0,
-              ['hole 5']: 0,
-              ['hole 6']: 0,
-              ['hole 7']: 0,
-              ['hole 8']: 0,
-              ['hole 9']: 0,
-              ['hole 10']: 0,
-              ['hole 11']: 0,
-              ['hole 12']: 0,
-              ['hole 13']: 0,
-              ['hole 14']: 0,
-              ['hole 15']: 0,
-              ['hole 16']: 0,
-              ['hole 17']: 0,
-              ['hole 18']: 0,
-              ['hole 19']: 0,
-              ['hole 20']: 0,
-              ['hole 21']: 0,
-              ['hole 22']: 0,    
-            }      
+            [`player ${i+1}`]: rows      
           }))
         })
         .catch((err) => {
@@ -399,6 +301,7 @@ const ScoreCard = () => {
       <Typography align='center' variant='h6' style={{fontWeight: 'bolder', width: '100%'}}>
         Disc Golf Hub
       </Typography>
+      <Button onClick={() => console.log(state)}>state</Button>
       <Grid item xs={12} >
         <Options handleChange={handleChange} holeValue={state.holes} playerValue={state.players} clearRowValues={clearRowValues}/>
       </Grid>
